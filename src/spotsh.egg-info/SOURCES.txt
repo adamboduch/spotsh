@@ -1,0 +1,13 @@
+setup.py
+src/spotsh/__init__.py
+src/spotsh/api.py
+src/spotsh/model.py
+src/spotsh/packagebuilder.py
+src/spotsh/packageuploader.py
+src/spotsh.egg-info/PKG-INFO
+src/spotsh.egg-info/SOURCES.txt
+src/spotsh.egg-info/dependency_links.txt
+src/spotsh.egg-info/entry_points.txt
+src/spotsh.egg-info/not-zip-safe
+src/spotsh.egg-info/requires.txt
+src/spotsh.egg-info/top_level.txt
