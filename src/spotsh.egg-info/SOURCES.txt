@@ -1,9 +1,11 @@
+README
 setup.py
 src/spotsh/__init__.py
 src/spotsh/api.py
 src/spotsh/model.py
 src/spotsh/packagebuilder.py
 src/spotsh/packageuploader.py
+src/spotsh/utils.py
 src/spotsh.egg-info/PKG-INFO
 src/spotsh.egg-info/SOURCES.txt
 src/spotsh.egg-info/dependency_links.txt
