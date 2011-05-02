@@ -120,20 +120,25 @@ def build_package(name, path):
     tf = tarfile.open(tf_name, 'w')
     
     try:    
-        m1 = StringIO(build_manifest1(cfg))
-        m1_tf = tarfile.TarInfo(name='description.xml')
-        m1_tf.size = len(m1.getvalue())
-        tf.addfile(m1_tf, fileobj=m1)
-        
-        m2 = StringIO(build_manifest2(cfg))
-        m2_tf = tarfile.TarInfo(name='manifest.txt')
-        m2_tf.size = len(m2.getvalue())
-        tf.addfile(m2_tf, fileobj=m2)
-            
-        for disk in cfg.disks:
-            tf.add(disk.get_gzipped_path(), disk.internal_name)
+    
+        try:
 
-        tf.close()      
+            m1 = StringIO(build_manifest1(cfg))
+            m1_tf = tarfile.TarInfo(name='description.xml')
+            m1_tf.size = len(m1.getvalue())
+            tf.addfile(m1_tf, fileobj=m1)
+            
+            m2 = StringIO(build_manifest2(cfg))
+            m2_tf = tarfile.TarInfo(name='manifest.txt')
+            m2_tf.size = len(m2.getvalue())
+            tf.addfile(m2_tf, fileobj=m2)
+                
+            for disk in cfg.disks:
+                tf.add(disk.get_gzipped_path(), disk.internal_name)
+
+        finally:
+            
+            tf.close()      
 
     except KeyboardInterrupt, AttributeError:
         os.unlink(tf_name)
