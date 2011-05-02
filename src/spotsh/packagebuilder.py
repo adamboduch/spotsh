@@ -245,25 +245,37 @@ def create_empty_disk(size):
     return gz_path
 
 def calculate_empty_hash(size):
-    hash = md5()
-    block_size = 1024*1024
-    zero = '\0' * block_size
     
-    while size>block_size:
-        hash.update(zero)
+    """Calculate and return the hash for an empty disk, using the
+    provided size."""
+    
+    empty_hash = md5()
+    block_size = MB
+    zero       = '\0' * block_size
+    
+    while size > block_size:
+        
+        empty_hash.update(zero)
         size -= block_size
-    hash.update(zero[:size])
-    return hash.hexdigest()
+        
+    empty_hash.update(zero[:size])
+    
+    return empty_hash.hexdigest()
 
 def calculate_hash(file_path):
-    hash = md5()
-    block_size = 1024*1024
     
-    f = open(file_path, 'rb')
+    """Calculate and return the hash for the provided file path."""
+    
+    file_hash  = md5()
+    block_size = MB
+    
+    with open(file_path, 'rb') as ifile:
 
-    for buf in f.read(block_size):
-        hash.update(buf)    
-    return hash.hexdigest()
+        for buf in ifile.read(block_size):
+            
+            file_hash.update(buf)
+            
+    return file_hash.hexdigest()
             
 class PackageConfig(object):
     def __init__(self, name, disks, boot_from, use_pae, use_acpi, use_apic, use_virtio, use_virtblk):
