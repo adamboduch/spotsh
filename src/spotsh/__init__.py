@@ -175,20 +175,14 @@ class InstanceCommand(BaseCommand):
                              dest='_create',
                              help='Create a new instance using a provider, appliance, and hardware key'),
                              
-        optparse.make_option('-p',
-                             '--provider',
-                             default=None,
-                             dest='_provider',
-                             help='Provider key used when creating an instance'),
-                             
         optparse.make_option('-a',
                              '--appliance',
                              default=None,
                              dest='_appliance',
                              help='Appliance key used when creating an instance'),
                              
-        optparse.make_option('-m',
-                             '--hardware',
+        optparse.make_option('-o',
+                             '--offer',
                              default=None,
                              dest='_hardware',
                              help='Hardware key used when creating an instance')
@@ -216,8 +210,7 @@ class InstanceCommand(BaseCommand):
         
         elif self.options._create:
             response = self.client.post('/api/v1/buyer/instances/list',
-                                        data = dict(provider=self.options._provider,
-                                                    appliance=self.options._appliance,
+                                        data = dict(appliance=self.options._appliance,
                                                     hardware=self.options._hardware))
             instance = self.parse_response(response, expected_status=httplib.CREATED)
             print model.Instance(instance)
