@@ -128,6 +128,7 @@ class MainCommand(object):
         commands = {'instance': InstanceCommand,
                     'appliance': ApplianceCommand,
                     'provider': ProviderCommand,
+                    'market': MarketCommand,
                     'hardware': HardwareCommand,
                     'logout': LogoutCommand,}
         
@@ -142,8 +143,9 @@ class MainCommand(object):
         return '\nspotsh instance \n'\
                '       appliance \n'\
                '       provider\n'\
+               '       market\n'\
                '       hardware\n'\
-               '       logout\n'\
+               '       logout\n'
         
         
 class InstanceCommand(BaseCommand):
@@ -346,15 +348,64 @@ class ProviderCommand(BaseCommand):
         return 'spotsh provider \n'
 
 
+class MarketCommand(BaseCommand):
+    command_options = (
+        optparse.make_option('-r', '--rating', default=None, dest='rating',
+                             type='int', help='Provider min rating (0..10)'),
+        optparse.make_option('--continent', default=None, dest='continent',
+                             help='Provider continent code (e.g. EU)'),
+        optparse.make_option('--country', default=None, dest='country',
+                             help='Provider country code (e.g. CA)'),
+        optparse.make_option('--city', default=None, dest='city',
+                             help='Provider city'),
+        optparse.make_option('--min-cpu', default=None, dest='min_cpu',
+                             type='int', help='Hardware profile min CPU count'),
+        optparse.make_option('--max-cpu', default=None, dest='max_cpu',
+                             type='int', help='Hardware profile max CPU count'),
+        optparse.make_option('--min-memory', default=None, dest='min_memory',
+                             type='int', help='Hardware profile min memory amount (MB)'),
+        optparse.make_option('--max-memory', default=None, dest='max_memory',
+                             type='int', help='Hardware profile max memory amount (MB)'),
+        optparse.make_option('-c', '--max-cost', default=None, dest='max_cost',
+                             help='Hardware profile max cost'),
+    )
+    
+    def __init__(self):
+        super(MarketCommand, self).__init__(self.command_options)
+        
+        params = {}
+        if self.options.rating is not None:
+            params['rating'] = self.options.rating
+        if self.options.continent is not None:
+            params['continent'] = self.options.continent
+        if self.options.country is not None:
+            params['country'] = self.options.country
+        if self.options.city is not None:
+            params['city'] = self.options.city
+        if self.options.min_cpu is not None:
+            params['min_cpu'] = self.options.min_cpu
+        if self.options.max_cpu is not None:
+            params['max_cpu'] = self.options.max_cpu
+        if self.options.max_memory is not None:
+            params['max_memory'] = self.options.max_memory * 1024 * 1024
+        if self.options.min_memory is not None:
+            params['min_memory'] = self.options.min_memory * 1024 * 1024
+        if self.options.max_cost is not None:
+            params['max_cost'] = self.options.max_cost
+        
+        response = self.client.get('/api/v1/buyer/hardware/list', params)
+        
+        hardware_list = self.parse_response(response)
+        for hardware in hardware_list:
+            print model.Hardware(hardware)
+    
+    def usage(self):
+        return 'spotsh market \n'
+
+
 class HardwareCommand(BaseCommand):
     
     command_options = (
-        optparse.make_option('-p',
-                             '--provider',
-                             default=None,
-                             dest='_provider',
-                             help='List hardware for the specified provider'),
-                             
         optparse.make_option('-l',
                              '--list',
                              action='store_true',
@@ -385,19 +436,7 @@ class HardwareCommand(BaseCommand):
         
         super(HardwareCommand, self).__init__(self.command_options)
             
-        # buyer part 
-
-        if self.options._provider:
-            response = self.client.get('/api/v1/buyer/provider/%s' % 
-                                                    self.options._provider)
-            provider = self.parse_response(response)
-            for hardware in provider['hardware']:
-                print model.Hardware(hardware)
-                
-        # provider part 
-        # TODO: separate
-                
-        elif self.options._list:
+        if self.options._list:
             response = self.client.get('/api/v1/provider/hardware/list')
             hardwares = self.parse_response(response)
             for hardware in hardwares:
